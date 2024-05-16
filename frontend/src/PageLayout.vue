@@ -1,11 +1,11 @@
 <template>
-  <div class="containerLayout">
+  <div class="containerLayout h-screen flex flex-col">
     <div class="header">
       <slot name="header"></slot>
     </div>
 
-    <div class="innercontainer bg-white w-20">
-      <div class="sidebar">
+    <div class="innercontainer flex h-lvh flex-row bg-white w-full">
+      <div class="sidebar border border-blue-900 md:w-15 hidden md:inline-flex">
         <slot name="sidebar" id="sidebar"></slot>
       </div>
       <div class="main-content">
@@ -15,26 +15,4 @@
   </div>
 </template>
 
-<style>
-.containerLayout {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-}
-.sidebar {
-  height: 100vh;
-  background-color: #fff;
-  width: 15vw;
-}
-.innercontainer {
-  width: 100%;
-  height: 100vh;
-  background-color: cyan;
-  display: flex;
-  flex-direction: row;
-}
-.header {
-  height: 10vh;
-  background-color: #fff;
-}
-</style>
+<style></style>
