@@ -21,9 +21,8 @@ export default {
         this.is_showSearchPopUp = false;
       } else {
         this.is_showSearchPopUp = true;
+        console.log(newVal);
       }
-
-      console.log(newVal);
     },
   },
   methods: {
