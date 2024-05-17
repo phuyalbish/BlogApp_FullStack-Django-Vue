@@ -5,7 +5,7 @@ export default {
   components: {},
   data() {
     return {
-      API: "http://127.0.0.1:8000",
+      API: "http://127.0.0.1:8000/",
       searchName: "",
       is_openPopupSideBar: true,
       is_showSearchPopUp: false,
@@ -34,13 +34,24 @@ export default {
   },
   methods: {
     LoginSubmit() {
-      axios.post(`${this.API}/api/logins/`, this.loginData);
+      axios({
+        method: "post",
+        url: `${this.API}api/logins/`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: this.loginData,
+      }).then(console.log(response));
     },
     RegisterSubmit() {
-      axios
-        .post(`${this.API}/api/register/`, this.signUpData)
-        .then(console.log(response));
-      console.log("asd");
+      axios({
+        method: "post",
+        url: `${this.API}api/register/`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: this.signUpData,
+      }).then(console.log(response));
     },
     searchArticles() {
       console.log(this.searchName);

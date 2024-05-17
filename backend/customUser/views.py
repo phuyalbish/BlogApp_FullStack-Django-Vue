@@ -23,6 +23,7 @@ def register(request):
         response = JsonResponse(payload, safe=False, status=200)
         response.set_cookie('refresh_token', encoded_refresh_Jwt) 
         response.set_cookie('access_token', encoded_access_Jwt)
+        print(payload)
         return response
         
 
@@ -65,6 +66,7 @@ def GenerateAccessToken(*args,**kwargs):
 def checkToken(token):
     try:
         tk =jwt.decode(token, 'mrvishope', algorithms='HS256')
+
         return True
     except:
         return False
@@ -87,7 +89,6 @@ def CheckRefreshAccessToken(refresh_token, access_token):
     return check
 
 
-@csrf_exempt
 def TokenAuthenticate(func):
     def wrapper(request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
@@ -99,6 +100,7 @@ def TokenAuthenticate(func):
                     ref = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
                     payload = GenerateAccessToken(jti=ref.get('id'))
                     responseData = func(request)
+                    breakpoint()
                     response = {
                             "msg": "Token Authenticated",
                             "status":200,
@@ -106,7 +108,6 @@ def TokenAuthenticate(func):
                             "payloadData": payload,
 
                         }
-                    return response
             else:
                 ref = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
                 payload = GenerateAccessToken()
@@ -130,44 +131,8 @@ def TokenAuthenticate(func):
                             "payloadData": "as",
                         }
 
-        return response
+        return JsonResponse(response.get('resData'), status=response.get('status'))
     return wrapper
-
-        # try:
-        #     access_payload = jwt.decode(access_token, 'mrvishope', algorithms='HS256')
-        #     response = {
-        #         "msg": "Invalid Token",
-        #         "status": 400,
-        #         "resData": "",
-        #         "payloadData": "",
-        #         "accessData": "" 
-
-        #     }
-        # except:
-        #     try:
-        #         refresh_payload = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
-        #         response = GenerateAccessToken(refresh_token)
-        #     except:
-        #         response = JsonResponse("Invalid Token", safe=False, status=400)
-        #     else:
-        #         response = GenerateAccessToken(refresh_token)
-        # else:
-        #     response = JsonResponse("Invalid Refresh Token", safe=False, status=400)
-               
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -175,11 +140,9 @@ def TokenAuthenticate(func):
 @TokenAuthenticate
 def login(request):
     requestData = json.loads(request.body)
-
     try:
         data =  Users.objects.values().get(email=requestData['email'],is_deleted=False)
         if data['password'] == requestData['password']:
-
             return data
         else:
             return "Invalid Password"
@@ -200,11 +163,6 @@ def checkMailAvailable(request):
             available = False
             break
     return JsonResponse({"availability": available } , safe=False, status=200)
-
-# def TokenAuth(func):
-#     def wrapper(request, **kwargs):
-
-#     return func()
 
 
 @csrf_exempt
@@ -227,6 +185,10 @@ def getUserData(request, **kwargs):
         "link": data['link'],
     }
     return JsonResponse(datawithoutPass, safe=False, status=200)
+
+
+
+
 @csrf_exempt
 def getUsersData(request):
     datas = list(Users.objects.values().filter(is_deleted=False))
@@ -248,11 +210,13 @@ def getUsersData(request):
             "link": data['link'],
         })
     return JsonResponse(datawithoutPass, safe=False, status=200)
+
 @csrf_exempt
 def setUsersData(request):
     data = json.loads(request.body)
     Users.objects.create(**data)
     return JsonResponse(data, safe=False, status=200)
+
 @csrf_exempt
 def editUserData(request, **kwargs):
     user_id = kwargs["id"]
@@ -266,37 +230,3 @@ def editUserData(request, **kwargs):
             }
     
     return JsonResponse(res, safe=False, status=200)
-
-
-
-
-
-    
-    
-    # refresh_token = request.COOKIES.get("refresh_token")
-    # access_token = request.COOKIES.get("access_token")
-    # if refresh_token:
-    #     if access_token:
-    #         try:
-    #             access_payload = jwt.decode(access_token, 'mrvishope', algorithms='HS256')
-    #             print(access_payload)
-    #             data =  Users.objects.values().get(pk=access_payload.get('id'))
-    #             return JsonResponse( combine_response("Success", access_payload, data), safe=False, status=200)
-    #         except:
-    #             try:
-    #                 refresh_payload = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
-    #                 accessTokenid = AccessToken.objects.values.get(jti=refresh_payload.get('jti'))
-    #                 access_payload={
-    #                     'token_type':'access',
-    #                     'id':accessTokenid.get('userid'),
-    #                     'exp': math.floor(time.time() + 100),
-    #                     'iat': math.floor(time.time()),
-    #                 }
-                    
-    #                 encoded_access_Jwt = jwt.encode(access_payload, "mrvishope",  algorithm="HS256")
-    #                 response = JsonResponse(combine_response("user created",refresh_payload,requestData), safe=False, status=200)
-    #                 response.set_cookie('access_token', encoded_access_Jwt) 
-    #                 return response
-    #             except:
-    #                 print(refresh_payload)
-    #                 return JsonResponse("Invalid Token", safe=False, status=200)
