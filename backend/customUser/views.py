@@ -100,7 +100,7 @@ def TokenAuthenticate(func):
                     ref = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
                     payload = GenerateAccessToken(jti=ref.get('id'))
                     responseData = func(request)
-                    breakpoint()
+                    # breakpoint()
                     response = {
                             "msg": "Token Authenticated",
                             "status":200,
