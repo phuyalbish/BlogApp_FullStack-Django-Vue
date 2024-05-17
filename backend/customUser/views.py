@@ -18,11 +18,9 @@ def register(request):
         user = Users.objects.values().get(email=requestData['email'])
         payload = GenerateAccessToken(userid=user.get('id'))
 
-        encoded_refresh_Jwt = jwt.encode(payload.get("refreshPayload"), "mrvishope",  algorithm="HS256")
-        encoded_access_Jwt = jwt.encode(payload.get("accessPayload"), "mrvishope",  algorithm="HS256")
         response = JsonResponse(payload, safe=False, status=200)
-        response.set_cookie('refresh_token', encoded_refresh_Jwt) 
-        response.set_cookie('access_token', encoded_access_Jwt)
+        response.set_cookie('refresh_token', payload.get('refreshJWT')) 
+        response.set_cookie('access_token', payload.get('accessJWT'))
         print(payload)
         return response
         
@@ -48,8 +46,8 @@ def GenerateAccessToken(*args,**kwargs):
         'iat': math.floor(time.time()),
     }
     payload={
-        "accessPayload":access_payload,
-        "refreshPayload":refresh_payload
+        "accessJWT":jwt.encode(access_payload, "mrvishope",  algorithm="HS256"),
+        "refreshJWT":jwt.encode(refresh_payload, "mrvishope",  algorithm="HS256")
     }
     if  kwargs.get('jti'):        
         AccessTokenDB.jti = kwargs.get('jti')
@@ -105,7 +103,6 @@ def TokenAuthenticate(func):
                             "msg": "Token Authenticated",
                             "status":200,
                             "resData": responseData,
-                            "payloadData": payload,
 
                         }
             else:
@@ -119,7 +116,6 @@ def TokenAuthenticate(func):
                             "msg": "Token Authenticated",
                             "status": 200,
                             "resData": responseData,
-                            "payloadData": payload,
                         }
                 
                 return response
@@ -128,9 +124,14 @@ def TokenAuthenticate(func):
                             "msg": "Refresh Token Not Authorized",
                             "status": 400,
                             "resData": "asdata",
-                            "payloadData": "as",
                         }
+        res = JsonResponse(response.get('resData'), status=response.get('status'))
 
+        print(refresh_token)
+        print(access_token)
+        breakpoint()
+        res.set_cookie('refresh_token', payload.get('refreshJWT')) 
+        res.set_cookie('access_token', payload.get('accessJWT'))
         return JsonResponse(response.get('resData'), status=response.get('status'))
     return wrapper
 

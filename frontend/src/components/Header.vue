@@ -43,6 +43,7 @@ export default {
         data: this.loginData,
       }).then(console.log(response));
     },
+
     RegisterSubmit() {
       axios({
         method: "post",
@@ -53,6 +54,7 @@ export default {
         data: this.signUpData,
       }).then(console.log(response));
     },
+
     searchArticles() {
       console.log(this.searchName);
     },
