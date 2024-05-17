@@ -2,6 +2,11 @@ from django.db import models
 from .manager import UserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
+
+class AccessToken(models.Model):
+    userid = models.IntegerField()
+    jti = models.CharField(max_length=100, unique=True, null=False)
+
 class  Users(AbstractBaseUser, PermissionsMixin):
     username: None
     email = models.CharField(max_length=50, null=False, unique=True)
@@ -25,6 +30,14 @@ class  Users(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.name
+    
+# class Follow(models.Model):
+#     follower_id = models.ForeignKey(Users,null=True, on_delete=models.SET_NULL)
+#     followedto_id = models.ForeignKey(Users,null=True, on_delete=models.SET_NULL)
+#     follower_name = models.CharField(max_length=50, null=True)
+
+
+
 
 
 

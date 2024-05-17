@@ -12,5 +12,19 @@ class Articles(models.Model):
     is_hidden = models.BooleanField(default=False)
     modifiedBy = models.CharField(max_length=50, null=True)
     totalLikes = models.IntegerField(default=0)
-    totalComments = models.IntegerField(default=0)
+    totalcomments = models.IntegerField(default=0)
+
+
+class Like(models.Model):
+    user_id = models.ForeignKey(Users,null=True, on_delete=models.SET_NULL)
+    article_id = models.ForeignKey(Articles,null=True, on_delete=models.SET_NULL)
+    user_name = models.CharField(max_length=50, null=True)
+
+class Comment(models.Model):
+    user_id = models.ForeignKey(Users,null=True, on_delete=models.SET_NULL)
+    article_id = models.ForeignKey(Articles,null=True, on_delete=models.SET_NULL)
+    comment = models.CharField(max_length=150, null=True)
+    user_name = models.CharField(max_length=50, null=True)
+
+
     

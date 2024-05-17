@@ -1,8 +1,11 @@
 <script>
+import axios from "axios";
+
 export default {
   components: {},
   data() {
     return {
+      API: "http://127.0.0.1:8000",
       searchName: "",
       is_openPopupSideBar: true,
       is_showSearchPopUp: false,
@@ -10,6 +13,10 @@ export default {
       is_shownSignUpForm: false,
       is_errorOccured: "",
       loginData: {
+        email: "",
+        password: "",
+      },
+      signUpData: {
         email: "",
         password: "",
       },
@@ -26,6 +33,15 @@ export default {
     },
   },
   methods: {
+    LoginSubmit() {
+      axios.post(`${this.API}/api/logins/`, this.loginData);
+    },
+    RegisterSubmit() {
+      axios
+        .post(`${this.API}/api/register/`, this.signUpData)
+        .then(console.log(response));
+      console.log("asd");
+    },
     searchArticles() {
       console.log(this.searchName);
     },
@@ -131,6 +147,7 @@ export default {
       </p>
       <div
         class="LoginSubmit bg-blue-800 py-2 px-4 rounded-full text-white shadow-blue-400 cursor-pointer hover:bg-white hover:text-blue-800 shadow-md"
+        @click="LoginSubmit"
       >
         Login
       </div>
@@ -149,13 +166,13 @@ export default {
         type="text"
         class="outline-none p-2 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
         placeholder="Email"
-        v-model="loginData.email"
+        v-model="signUpData.email"
       />
       <input
         type="password"
         class="outline-none p-2 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
         placeholder="Password"
-        v-model="loginData.password"
+        v-model="signUpData.password"
       />
       <p
         class="text-blue-900 cursor-pointer underline underline-offset-1"
@@ -165,6 +182,7 @@ export default {
       </p>
       <div
         class="LoginSubmit bg-blue-800 py-2 px-4 rounded-full text-white shadow-blue-400 cursor-pointer hover:bg-white hover:text-blue-800 shadow-md"
+        @click="RegisterSubmit"
       >
         SignUp
       </div>
