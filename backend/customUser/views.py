@@ -16,26 +16,17 @@ def register(request):
     except:
         Users.objects.create(email=requestData['email'], password=requestData['password'])
         user = Users.objects.values().get(email=requestData['email'])
-        payload = GenerateAccessToken(userid=user.get('id'))
-
+        payload = GenerateNewToken(user.get('id'))
         response = JsonResponse(payload, safe=False, status=200)
-        response.set_cookie('refresh_token', payload.get('refreshJWT')) 
-        response.set_cookie('access_token', payload.get('accessJWT'))
-        print(payload)
         return response
         
 
 
-def GenerateAccessToken(*args,**kwargs):
-    if kwargs.get('userid'):
-        userID = kwargs.get('userid')
-    if kwargs.get('jti'):
-        AccessTokenDB = AccessToken.objects.get(jti=kwargs.get('jti'))
-        userID = AccessTokenDB.userid
+def GenerateNewToken(userId):
     access_payload={
         'token_type':'access',
         'jti': math.floor(time.time()  - 100),
-        'id':userID,
+        'id':userId,
         'exp': math.floor(time.time() + 10000),
         'iat': math.floor(time.time()),
     }
@@ -49,108 +40,154 @@ def GenerateAccessToken(*args,**kwargs):
         "accessJWT":jwt.encode(access_payload, "mrvishope",  algorithm="HS256"),
         "refreshJWT":jwt.encode(refresh_payload, "mrvishope",  algorithm="HS256")
     }
-    if  kwargs.get('jti'):        
-        AccessTokenDB.jti = kwargs.get('jti')
-        AccessTokenDB.userid = access_payload.get('id')
-        AccessTokenDB.save()
-    else:
-        newToken = AccessToken.objects.create(jti=access_payload.get('jti'), userid=access_payload.get('id'))
-        newToken.save()
+    newToken = AccessToken.objects.create(jti=access_payload.get('jti'), userid=access_payload.get('id'))
+    newToken.save()
     return payload
 
 
 
 
-def checkToken(token):
-    try:
-        tk =jwt.decode(token, 'mrvishope', algorithms='HS256')
+def RegenerateToken(id):
 
-        return True
-    except:
-        return False
-    
-def CheckRefreshAccessToken(refresh_token, access_token):
-    check={
-        "refreshChecked": True,
-        "accessChecked": True
-
+    AccessTokenDB = AccessToken.objects.get(userid=id) 
+    access_payload={
+        'token_type':'access',
+        'jti': math.floor(time.time()  - 100),
+        'id':id,
+        'exp': math.floor(time.time() + 10000),
+        'iat': math.floor(time.time()),
     }
-    if refresh_token:
-        check['refreshChecked'] = checkToken(refresh_token)
-        if check['refreshChecked']:
-            if access_token:
-                check['accessChecked'] = checkToken(access_token)
-            else:
-                check['accessChecked'] = False
-    else:
-        check.refreshChecked = False
-    return check
+    refresh_payload={
+        'token_type':'refresh',
+        'id':access_payload.get('jti'),
+        'exp': math.floor(time.time() + 2592000),
+        'iat': math.floor(time.time()),
+    }
+
+    payload={
+        "accessJWT":jwt.encode(access_payload, "mrvishope",  algorithm="HS256"),
+        "refreshJWT":jwt.encode(refresh_payload, "mrvishope",  algorithm="HS256")
+    }
+     
+    AccessTokenDB.jti = access_payload.get('jti')
+    AccessTokenDB.save()
+    return payload
 
 
-def TokenAuthenticate(func):
+
+def RegenerateTokenFromJTI(id):
+    AccessTokenDB = AccessToken.objects.get(jti=id) 
+    access_payload={
+        'token_type':'access',
+        'jti': math.floor(time.time()  - 100),
+        'id':1,
+        'exp': math.floor(time.time() + 10000),
+        'iat': math.floor(time.time()),
+    }
+    refresh_payload={
+        'token_type':'refresh',
+        'id':access_payload.get('jti'),
+        'exp': math.floor(time.time() + 2592000),
+        'iat': math.floor(time.time()),
+    }
+
+    payload={
+        "accessJWT":jwt.encode(access_payload, "mrvishope",  algorithm="HS256"),
+        "refreshJWT":jwt.encode(refresh_payload, "mrvishope",  algorithm="HS256")
+    }    
+    AccessTokenDB.jti = access_payload.get('jti')
+    AccessTokenDB.save()
+    return payload
+
+
+def verify(func):
     def wrapper(request, *args, **kwargs):
-        refresh_token = request.COOKIES.get("refresh_token")
-        access_token = request.COOKIES.get("access_token")
-        access = jwt.decode(access_token, 'mrvishope', algorithms='HS256')
-        checkToken = CheckRefreshAccessToken(refresh_token, access_token)
-        if checkToken.get('refreshChecked'):
-            if checkToken.get('accessChecked'):
-                    ref = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
-                    payload = GenerateAccessToken(jti=ref.get('id'))
-                    responseData = func(request)
-                    # breakpoint()
-                    response = {
-                            "msg": "Token Authenticated",
-                            "status":200,
-                            "resData": responseData,
-
-                        }
-            else:
-                ref = jwt.decode(refresh_token, 'mrvishope', algorithms='HS256')
-                payload = GenerateAccessToken()
-                access_token = request.COOKIES.get("access_token")
-                checkToken = CheckRefreshAccessToken(refresh_token, access_token)
-                jwt.decode(access_token, 'mrvishope', algorithms='HS256')
-                responseData = func(request)
+        if request.headers.get('Authorization'):
+            try:
+                payload = jwt.decode(request.headers.get('Authorization'), 'mrvishope', algorithms='HS256')
+                print(request.headers.get('RefreshToken'))
+                responseData = func(request, payload['id'])
                 response = {
-                            "msg": "Token Authenticated",
+                        "status":200,
+                        "resData": responseData,
+                    }
+            except:
+                response = {
                             "status": 200,
-                            "resData": responseData,
+                            "resData": "Not Authenticated",
                         }
-                
-                return response
         else:
-            response = {
-                            "msg": "Refresh Token Not Authorized",
-                            "status": 400,
-                            "resData": "asdata",
+                try:
+                    payload = jwt.decode(request.headers.get('RefreshToken'), 'mrvishope', algorithms='HS256')
+                    response = {    
+                            "status": 204,
+                            "resData": RegenerateTokenFromJTI(payload['id']),
                         }
-        res = JsonResponse(response.get('resData'), status=response.get('status'))
-
-        print(refresh_token)
-        print(access_token)
-        breakpoint()
-        res.set_cookie('refresh_token', payload.get('refreshJWT')) 
-        res.set_cookie('access_token', payload.get('accessJWT'))
-        return JsonResponse(response.get('resData'), status=response.get('status'))
+                except:
+                    response = {
+                            "status": 200,
+                            "resData": "No Token",
+                        }
+        return JsonResponse(response, safe=False, status=200)
     return wrapper
 
 
 
+
 @csrf_exempt
-@TokenAuthenticate
-def login(request):
+def logins(request):
     requestData = json.loads(request.body)
     try:
         data =  Users.objects.values().get(email=requestData['email'],is_deleted=False)
         if data['password'] == requestData['password']:
-            return data
+            jwt = RegenerateToken(data['id'])
+            allData ={
+                "data": DataWithoutPass(data),
+                "jwt" : jwt
+            }
+            response =  JsonResponse(allData, safe=False, status=200)
+            # response['accessToken'] = payload.get('accessJWT')
+            # response['refreshToken'] = payload.get('refreshJWT')
+            return response
         else:
-            return "Invalid Password"
+            return JsonResponse("Wrong UserName/Password", safe=False, status=400)
     except:
-        return "Invalid Email"
-    
-        
+        return JsonResponse("Wrong UserName/Password", safe=False, status=400)
+
+
+
+
+@csrf_exempt
+@verify
+def checkToken(request, id):
+    try:
+        data =  Users.objects.values().get(pk=id,is_deleted=False)
+        datawithoutPass = DataWithoutPass(data)
+        return datawithoutPass
+    except:
+        return "No Data"
+
+
+
+
+
+
+
+def DataWithoutPass(data):
+    datawithoutPass = {
+        "id": data['id'],
+        "email": data['email'],
+        "name": data['name'],
+        "bio": data['bio'],
+        'gender': data['gender'],
+        "img_src": data['img_src'],
+        "total_follower": data['total_follower'],
+        "total_post": data['total_post'],
+        "link": data['link'],
+    }
+    return datawithoutPass
+
+
 
 
 
@@ -164,29 +201,6 @@ def checkMailAvailable(request):
             available = False
             break
     return JsonResponse({"availability": available } , safe=False, status=200)
-
-
-@csrf_exempt
-def getUserData(request, **kwargs):
-    userid = kwargs["id"]
-    data = Users.objects.values().get(is_deleted=False, id=userid)
-    datawithoutPass = {
-        "id": data['id'],
-        "username": data['username'],
-        "fullname": data['fullname'],
-        'gender': data['gender'],
-        "phone": data['phone'],
-        "skills": data['skills_id'],
-        "field": data['field_id'],
-        "faculty": data['faculty_id'],
-        "interest": data['interest_id'],
-        "email": data['email'],
-        "country": data['country_id'],
-        "city": data['city_id'],
-        "link": data['link'],
-    }
-    return JsonResponse(datawithoutPass, safe=False, status=200)
-
 
 
 
@@ -231,3 +245,6 @@ def editUserData(request, **kwargs):
             }
     
     return JsonResponse(res, safe=False, status=200)
+
+
+

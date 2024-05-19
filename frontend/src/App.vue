@@ -1,31 +1,25 @@
 <script>
-import PageLayout from "./PageLayout.vue";
-import Header from "./components/Header.vue";
-import Sidebar from "./components/Sidebar.vue";
-import Body from "./pages/Body.vue";
-
+import Dashboard from "./Dashboard.vue";
+import Home from "./Home.vue";
+import LoginSignUp from "./components/LoginSignUp.vue";
+import axios from "axios";
 export default {
   components: {
-    PageLayout,
-    Header,
-    Sidebar,
-    Body,
+    LoginSignUp,
+    Dashboard,
+    Home
+    
   },
+  data(){
+      return {
+      }
+  },
+
 };
 </script>
 
 <template>
-  <PageLayout id="display-flex">
-    <template #sidebar>
-      <Sidebar class="" />
-    </template>
-    <template #header>
-      <Header />
-    </template>
-    <template #content>
-      <Body />
-    </template>
-  </PageLayout>
+  <router-view/>
 </template>
 
 <style></style>
