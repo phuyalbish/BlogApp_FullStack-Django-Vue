@@ -12,7 +12,7 @@ def register(request):
     requestData = json.loads(request.body)
     try:
         Users.objects.values().get(email=requestData['email'])
-        return JsonResponse("Email already exists", safe=False, status=200)
+        return JsonResponse("Email already exists", safe=False, status=400)
     except:
         Users.objects.create(email=requestData['email'], password=requestData['password'])
         user = Users.objects.values().get(email=requestData['email'])
@@ -161,23 +161,19 @@ def logins(request):
 @verify
 def checkToken(request, id):
     try:
-        data =  Users.objects.values().get(pk=id,is_deleted=False)
+        data =  Users.objects.values().get(pk=id, is_deleted=False)
+        print(data)
         datawithoutPass = DataWithoutPass(data)
+        print(datawithoutPass)
         return datawithoutPass
     except:
-        return "No Data"
-
-
-
-
-
-
+        return "No Dataa"
 
 def DataWithoutPass(data):
     datawithoutPass = {
         "id": data['id'],
         "email": data['email'],
-        "name": data['name'],
+        "fname": data['fname'],
         "bio": data['bio'],
         'gender': data['gender'],
         "img_src": data['img_src'],

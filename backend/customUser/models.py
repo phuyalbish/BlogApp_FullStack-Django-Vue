@@ -10,7 +10,7 @@ class AccessToken(models.Model):
 class  Users(AbstractBaseUser, PermissionsMixin):
     username: None
     email = models.CharField(max_length=50, null=False, unique=True)
-    name = models.CharField(max_length=50, null=True)
+    fname = models.CharField(max_length=50, null=True)
     bio = models.CharField(max_length=200, null=True)
     link = models.CharField(max_length=100, null=True)
     gender = models.CharField(max_length=100, default="Male")

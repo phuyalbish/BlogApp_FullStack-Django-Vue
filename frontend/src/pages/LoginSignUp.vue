@@ -53,7 +53,44 @@
         class="outline-none p-2 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
         placeholder="Password"
         v-model="signUpData.password"
+        @focus="validatePassword"
       />
+      <input
+        type="password"
+        class="outline-none p-2 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
+        placeholder="re-type Password"
+        v-model="signUpData.repassword"
+      />
+      <input
+        type="text"
+        class="outline-none p-2 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
+        placeholder="Full Name"
+        v-model="signUpData.fname"
+      />
+      
+      <div class="genderField  flex gap-6 outline-none p-3 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900">
+              <label for="male"><input
+        type="radio"
+        id="male"
+        value="male"
+        name="gender"
+        v-model="signUpData.gender"
+      /> 
+       Male</label>  
+      
+      <label for="female">
+       <input
+        type="radio"
+        id="male"
+        value="female"
+        name="gender" selected="selected"
+        v-model="signUpData.gender" 
+      /> 
+       Female</label>
+      </div>
+
+
+         
       <p
         class="text-blue-900 cursor-pointer underline underline-offset-1"
         @click="ToggleLoginDiv"
@@ -73,6 +110,7 @@
     </div>
 </template>
 <script>
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=.*[^\w\d\s]).{8,}$/;
 import axios from 'axios';
 export default{
         data(){
@@ -91,6 +129,12 @@ export default{
                 signUpData: {
                     email: "",
                     password: "",
+                    repassword:"",
+                    fname:"",
+                    // link:"",
+                    gender:"male",
+                    // img_src:"",
+
                 },
             }
         },
@@ -124,11 +168,11 @@ export default{
                 axios
                   .post(`${this.API}api/logins/`, this.loginData, {
                     headers: {
-                    "authorization": localStorage.getItem("access_token"),
                     "content-Type": "application/json",
                     },
                   })
                   .then((response) => {
+                    console.log(response)
                   if(response.status == 200){
                       localStorage.setItem("refresh_token",response.data.jwt.refreshJWT);
                       localStorage.setItem("access_token",response.data.jwt.accessJWT);
@@ -142,6 +186,20 @@ export default{
         
     },
 
+
+    // Register..................
+    validatePassword(){
+          if (passwordRegex.test(this.signUpData.password)){
+                if(this.signUpData.repassword == this.signUpData.password){
+                  this.is_errorOccured = "as"
+                }
+          }
+          else{
+            this.is_errorOccured =="Password must contain atleast 8 characte of 1 Uppercase and 1 Numeric"
+          }
+
+    },
+
     RegisterSubmit() {
       axios({
         method: "post",
@@ -151,12 +209,14 @@ export default{
         },
         data: this.signUpData,
       }).then(response => {
-        if (response.data.refreshJWT != undefined || response.data.accessJWT != undefined){
-        localStorage.setItem("refresh_token",response.data.refreshJWT);
-        localStorage.setItem("access_token",response.data.accessJWT);
-        this.is_LoggedIn = true
         console.log(response)
+        if(response.status == 200){
+                      localStorage.setItem("refresh_token",response.data.refreshJWT);
+                      localStorage.setItem("access_token",response.data.accessJWT);
+                      this.$router.push('/dashboard')
         }
+      }).catch(err => {
+        console.log(err.response.data)
       });
     },
     ToggleLoginDiv() {

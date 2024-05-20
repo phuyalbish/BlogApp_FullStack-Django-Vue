@@ -15,24 +15,21 @@ export default {
   data(){
     return {
       API: "http://127.0.0.1:8000/",
-      userData:{
-        fname:"",
-      },
+      userData:"",
       access_token :localStorage.getItem("access_token"),
       refresh_token : localStorage.getItem("refresh_token"),
     }
   },
+
   mounted(){
-    if(this.access_token  && this.refresh_token){
+     if(this.access_token  && this.refresh_token){
           axios.post(`${this.API}api/checkToken/`, {}, {
           headers: {
           "authorization": localStorage.getItem("access_token"),
           "content-Type": "application/json",
           }}).then(response =>{
               if(response.status == 200){
-                console.log(response)
-              this.userData.fname = response.data.email
-              this.is_LoggedIn = true
+                this.$store.userData = response.data
 
               }
         })
@@ -40,17 +37,17 @@ export default {
       else{
         this.$router.push('/')
       }
-    }
+  }
 };
 </script>
 
 <template>
   <PageLayout id="display-flex">
     <template #sidebar>
-      <Sidebar class="" />
+      <!-- <Sidebar class="" /> -->
     </template>
     <template #header>
-      <Header />
+      <Header :user="userData"/>
     </template>
     <template #content>
       <Body />
