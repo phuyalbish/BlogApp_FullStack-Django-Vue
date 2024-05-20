@@ -3,6 +3,7 @@ import axios from "axios";
 import TopPage from "./modals/EditUser.vue";
 import AddArticle from "./AddArticle.vue"
 import store from "@/store/store";
+import { mapGetters } from "vuex";
 
 export default {
   components: {TopPage, AddArticle},
@@ -11,10 +12,7 @@ export default {
   ],
   data() {
     return {
-      API: "http://127.0.0.1:8000/",
       userData:"",
-      access_token :localStorage.getItem("access_token"),
-      refresh_token : localStorage.getItem("refresh_token"),
       articleData:"",
       searchName: "",
       is_openPopupSideBar: false,
@@ -23,36 +21,16 @@ export default {
       addShow: false
     };
   },
-  mounted(){
-    console.log("****")
-    console.log(this.getUserData)
-    console.log("****")
-    
-    // if(this.access_token  && this.refresh_token){
-    //       axios.post(`${this.API}api/checkToken/`, {}, {
-    //       headers: {
-    //       "authorization": localStorage.getItem("access_token"),
-    //       "content-Type": "application/json",
-    //       }}).then(response =>{
-    //           if(response.status == 200){
-    //             this.$store.userData = response.data.resData
-    //             console.log(this.$store.userData)
-
-    //           }
-    //     })
-    //   }
-    //   else{
-    //     this.$router.push('/')
-    //   }
-  
-  },
 
 computed:{
- getUserData(){
-  return this.$store.getters.getUserData
+ getData(){
+    return store.getters.getUserData
  }
 },
   watch: {
+    getData(newVal){
+        this.userData = newVal.resData
+    },
     searchName(newVal) {
       if (newVal == "") {
         this.is_showSearchPopUp = false;
@@ -63,10 +41,6 @@ computed:{
     },
   },
   methods: {
-    // users () {
-    //   console.log(this.$store.userData)
-    //   return this.$store.userData
-    // },
     logOut(){
          localStorage.removeItem("refresh_token");
          localStorage.removeItem("access_token");
@@ -141,8 +115,7 @@ computed:{
       class="threeBar text-2xl text-blue-900 cursor-pointer select-none"
       @click="openClosePopupSideBar"
     >  
-      {{userData }}  
-      Profile 
+      {{userData.email }}
     </div>
     <div
       v-if="is_showSearchPopUp"

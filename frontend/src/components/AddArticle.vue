@@ -16,7 +16,7 @@
     </div>
   </div> --> 
 
- <div class="LoginInSignUp z-50 flex flex-col items-center m-auto gap-4 p-10 md:w-4/6 border bg-white rounded-lg shadow-md shadow-blue-400">
+ <div class="LoginInSignUp right-10 z-50 absolute flex flex-col items-center m-auto gap-4 p-10 border bg-white rounded-lg shadow-md shadow-blue-400">
       
       <div class="flex  w-full justify-between">
           <h3 class="text-2xl text-blue-900">Add Article</h3>

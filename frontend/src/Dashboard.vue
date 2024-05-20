@@ -22,6 +22,7 @@ export default {
   },
 
   mounted(){
+    console.log(":::dashboard")
      if(this.access_token  && this.refresh_token){
           axios.post(`${this.API}api/checkToken/`, {}, {
           headers: {

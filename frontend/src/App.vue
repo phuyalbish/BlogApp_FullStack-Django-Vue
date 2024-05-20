@@ -3,7 +3,8 @@ import Dashboard from "./Dashboard.vue";
 import Home from "./Home.vue";
 import LoginSignUp from "./pages/LoginSignUp.vue";
 import axios from "axios";
-import store from "@/store/store";
+import store from "./store/store";
+import { mapActions } from "vuex";
 export default {
   components: {
     LoginSignUp,
@@ -20,23 +21,33 @@ export default {
       }
   },
 
-  async mounted(){
-    if(this.access_token  && this.refresh_token){
-          await axios.post(`${this.API}api/checkToken/`, {}, {
-          headers: {
-          "authorization": localStorage.getItem("access_token"),
-          "content-Type": "application/json",
-          }}).then(response =>{
-              if(response.status == 200){
-                // this.$store.userData = response.data.resData
-                store.commit('updateUserData', response.data.resData)
-                  // console.log(this.$store.userData)
-              }
-        })
-      }
-      else{
-        this.$router.push('/')
-      }
+  mounted(){
+      this.getUserData()
+    },
+    methods:{
+
+        ...mapActions(['setUserData']),
+       async getUserData(){
+          if(this.access_token  && this.refresh_token){
+              await axios.post(`${this.API}api/checkToken/`, {}, {
+              headers: {
+              "authorization": localStorage.getItem("access_token"),
+              "content-Type": "application/json",
+              }}).then(response =>{
+                  if(response.status == 200){
+                    // this.$store.userData = response.data.resData
+                    // store.commit('updateUserData', response.data.resData)
+                    console.log("*******")
+                      console.log(response.data)
+                    console.log("*********")
+                    store.commit('SET_USER_DATA',response.data)
+                  }
+            })
+          }
+          else{
+            this.$router.push('/')
+          }
+        }
     }
 
 };
