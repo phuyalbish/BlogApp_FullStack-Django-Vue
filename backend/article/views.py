@@ -4,6 +4,7 @@ from django.http import JsonResponse
 import jwt, math, time
 from django.views.decorators.csrf import csrf_exempt
 import json
+from customUser.models  import Users
 
 
 @csrf_exempt
@@ -20,6 +21,11 @@ def getArticle(request, **kwargs):
 @csrf_exempt
 def addArticle(request):
     data = json.loads(request.body)
+    print(data)
+    # data['authorid'] = Users.objects.get(id=data['authorid'])
+
+    print("***********88888")
+    print(data)
     Articles.objects.create(**data)
     return JsonResponse(data, safe=False, status=200)
 

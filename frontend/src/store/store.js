@@ -7,7 +7,6 @@ export default createStore({
   mutations:{
     SET_USER_DATA(state, userData) {
     state.userData =  userData;
-    console.log("::::::state",state.userData)
     },
   },
   actions:{

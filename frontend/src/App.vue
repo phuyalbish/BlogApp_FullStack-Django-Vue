@@ -35,11 +35,6 @@ export default {
               "content-Type": "application/json",
               }}).then(response =>{
                   if(response.status == 200){
-                    // this.$store.userData = response.data.resData
-                    // store.commit('updateUserData', response.data.resData)
-                    console.log("*******")
-                      console.log(response.data)
-                    console.log("*********")
                     store.commit('SET_USER_DATA',response.data)
                   }
             })

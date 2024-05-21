@@ -1,6 +1,6 @@
 <script>
 import axios from "axios";
-import TopPage from "./modals/EditUser.vue";
+import TopPage from "./EditUser.vue";
 import AddArticle from "./AddArticle.vue"
 import store from "@/store/store";
 import { mapGetters } from "vuex";
@@ -122,14 +122,10 @@ computed:{
       class="z-20 searchField absolute top-36 z-2 w-5/6 h-20 sm:top-20 border rounded-lg shadow-md bg-white shadow-blue-400"
     ></div>
     
-    <div
-      v-if="is_openPopupSideBar"
-      class="flex flex-col items-center gap-4 z-10 p-5 popUpSidebar w-5/6 absolute top-20 border bg-white rounded-lg shadow-md shadow-blue-400"
-    >
+    <div v-if="is_openPopupSideBar" class="flex flex-row items-center gap-4 z-10 p-10 popUpSidebar absolute top-20 right-10 border b rounded-lg shadow-md shadow-blue-400 bg-blue-100">
 
-      <div
-        class="flex justify-between sm:hidden searchbar align-middle rounded-full overflow-hidden shadow-inner shadow-blue-400"
-      >
+      <div class="leftSide flex flex-col gap-3">
+        <div class="flex justify-between sm:hidden searchbar align-middle rounded-full overflow-hidden shadow-inner shadow-blue-400">
         <input
           type="text"
           class="outline-none px-4 bg-transparent flex-grow"
@@ -140,10 +136,11 @@ computed:{
         />
         <p class="p-2">&#128269;</p>
       </div>
-      <div class="addArticle" @click="addClickOn">Add Article</div>
-      <div class="addProfile "  @click="editClickOn" >Edit Profile</div>
-      <div class="addProfile "  @click="logOut" >LogOut</div>
+      <div class="addArticle cursor-pointer text-white border rounded-md px-5 py-2 hover:text-blue-900 hover:bg-transparent bg-blue-700 border-blue-700" @click="addClickOn">Add Article</div>
+      <div class="addProfile cursor-pointer text-white border rounded-md px-5 py-2 hover:text-blue-900 hover:bg-transparent bg-blue-700 border-blue-700"  @click="editClickOn" >Edit Profile</div>
+      <div class="addProfile cursor-pointer text-white border rounded-md px-5 py-2 hover:text-blue-900 hover:bg-transparent bg-red-700 border-red-700"  @click="logOut" >LogOut</div>
     </div>
+      </div>
   </div>
 
   <AddArticle 

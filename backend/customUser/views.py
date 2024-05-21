@@ -20,7 +20,9 @@ def register(request):
         response = JsonResponse(payload, safe=False, status=200)
         return response
         
-
+@csrf_exempt
+def updateUser(request):
+    pass
 
 def GenerateNewToken(userId):
     access_payload={
@@ -105,17 +107,31 @@ def verify(func):
         if request.headers.get('Authorization'):
             try:
                 payload = jwt.decode(request.headers.get('Authorization'), 'mrvishope', algorithms='HS256')
-                print(request.headers.get('RefreshToken'))
+                
                 responseData = func(request, payload['id'])
                 response = {
                         "status":200,
                         "resData": responseData,
                     }
             except:
-                response = {
-                            "status": 200,
-                            "resData": "Not Authenticated",
-                        }
+                if request.headers.get('RefreshToken'):
+                    try:
+                        payload = jwt.decode(request.headers.get('RefreshToken'), 'mrvishope', algorithms='HS256')
+                        response = {    
+                                "status": 204,
+                                "resData": RegenerateTokenFromJTI(payload['id']),
+                            }
+                    except:
+                        response = {
+                                "status": 200,
+                                "resData": "No Token",
+                            }
+                
+                else:   
+                    response = {
+                                "status": 200,
+                                "resData": "Not Authenticated",
+                            }
         else:
                 try:
                     payload = jwt.decode(request.headers.get('RefreshToken'), 'mrvishope', algorithms='HS256')

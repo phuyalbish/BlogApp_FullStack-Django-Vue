@@ -1,7 +1,7 @@
 <script>
 import axios from "axios";
 import EditProfile from "./EditProfile.vue";
-import TopPage from "@/components/modals/EditUser.vue";
+import TopPage from "@/components/EditUser.vue";
 export default {
   components: { TopPage },
   data() {

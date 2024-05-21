@@ -16,7 +16,7 @@
     </div>
   </div> --> 
 
- <div class="LoginInSignUp right-10 z-50 absolute flex flex-col items-center m-auto gap-4 p-10 border bg-white rounded-lg shadow-md shadow-blue-400">
+ <div class="LoginInSignUp right-10 z-50 absolute flex flex-col items-center m-auto gap-4 p-10 border bg-blue-100 rounded-lg shadow-md shadow-blue-400">
       
       <div class="flex  w-full justify-between">
           <h3 class="text-2xl text-blue-900">Add Article</h3>
@@ -45,6 +45,29 @@
         v-model="article.further_readings"
       />
 
+      <input
+        type="text"
+        class="outline-none p-2 flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
+        placeholder="Author"
+        v-model="article.authorname"
+        disabled
+      />
+
+      <select
+      class="outline-none p-3  flex-grow rounded-full overflow-hidden shadow-inner shadow-blue-400 text-blue-900"
+      v-model="article.categoryname"
+    >
+      <option disabled value="">Select Category</option>
+      <!-- Use v-for to loop through categories -->
+      <option
+        v-for="(category, index) in categories"
+        :key="index"
+        :value="category"
+      >
+        {{ category }}
+      </option>
+    </select>
+
       <div
         class="LoginSubmit bg-blue-800 py-2 px-4 rounded-full text-white shadow-blue-400 cursor-pointer hover:bg-white hover:text-blue-800 shadow-md"
         @click="addArticle"
@@ -59,13 +82,12 @@
 
 <script>
 import axios from 'axios';
+import store from '@/store/store';
 export default {
   components: {
   },
   emits: ["addShow"],
-  props: {
 
-  },
   data() {
     return {
 
@@ -75,18 +97,31 @@ export default {
             title:"",
             description:"",
             further_readings:"",
+            // authorid: "",
+            authorname: "",
+            categoryname:""
+
         },
-      shownPage: "ZeroPageForm",
       is_changeData: false,
       is_errorOccured: false,
       errorMessage: "",
       userId: localStorage.getItem("userId"),
       changedData: {},
       checkAvailability: false,
+      categories: ["Science", "Math", "Programming", "Physics"]
 
     };
   },
+  computed:{
+      getData(){
+        return store.getters.getUserData
+      }
+  },
   watch: {
+      getData(newVal){
+        // this.article.authorid = newVal.resData.id
+        this.article.authorname = newVal.resData.email
+      }
   },
 
   mounted() {

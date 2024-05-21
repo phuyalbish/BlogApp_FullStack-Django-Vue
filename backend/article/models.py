@@ -7,6 +7,7 @@ class Articles(models.Model):
     further_readings = models.CharField(max_length=200)
     authorid = models.ForeignKey(Users, null=True, on_delete=models.SET_NULL)
     authorname = models.CharField(max_length=50, null=True)
+    categoryname = models.CharField(max_length=50, null=True)
     is_deleted = models.BooleanField(default=False)
     is_hidden = models.BooleanField(default=False)
     modifiedBy = models.CharField(max_length=50, null=True)
