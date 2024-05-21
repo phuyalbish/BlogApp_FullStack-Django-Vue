@@ -15,7 +15,7 @@
                 <p>{{articleDetails.totalLikes}} Likes</p>
             </div>
 
-            <div v-if="articleDetails.authorname == email" class="flex gap-2">
+            <div v-if="articleDetails.authorname == compareEmail" class="flex gap-2">
                 <div class="bg-blue-700 cursor-pointer rounded-2xl h-10 p-2 px-4 text-white hover:bg-white hover:text-blue-900 border border-blue-700">Edit</div>
                 <div class="bg-red-700 cursor-pointer rounded-2xl h-10 p-2 px-4 text-white  hover:bg-white hover:text-red-900 border border-red-700">Delete</div>
             </div>
@@ -39,16 +39,35 @@
 </template>
 
 <script>
+
 import store from '@/store/store';
         export default{
             emits: ['viewDetail'],
             props: {
                 articleDetails:"",
         },
-        data(){
-            return {
-                email:"",
-            }
+        computed:{
+                getData(){
+                    return store.getters.getUserData
+                }
+            },
+            data(){
+
+                return {
+                    compareEmail : ""
+                }
+            },
+            watch: {
+                getData(newVal){
+                    // this.article.authorid = newVal.resData.id
+                    console.log("************888")
+                    console.log(newVal.resData.email)
+                    this.compareEmail = newVal.resData.email
+                }
+            },
+        mounted(){
+            console.log(this.compareEmail)
+            console.log(this.articleDetails.authorname)
         },
             methods:{
                     closeDetail() {
@@ -57,16 +76,6 @@ import store from '@/store/store';
             
             },
 
-            computed:{
-                getData(){
-                    return store.getters.getUserData
-                }
-            },
-            watch: {
-                getData(newVal){
-                    // this.article.authorid = newVal.resData.id
-                    this.userId = newVal.resData.email
-                }
-            },
+            
         }
 </script>

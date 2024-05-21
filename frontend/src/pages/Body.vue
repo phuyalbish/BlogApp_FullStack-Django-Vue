@@ -11,9 +11,11 @@ export default{
             API: "http://127.0.0.1:8000/",
             viewDetail: false,
             articleDetail:"",
+            email:"",
          };
         
     },
+    
     mounted(){
           axios.get(`${this.API}api/articles/getAllArticle/`).then(response =>{
               console.log(response)
@@ -40,7 +42,7 @@ export default{
 </script>
 <template>
      <div class="mt-10 articleContainer flex gap-5 flex-wrap flex-shrink">
-     <ViewDetail v-if="viewDetail" :articleDetails="articleDetail"  class="rounded-lg shadow-lg p-10 shadow-blue-600 flex md:ml-20 absolute w-5/6 h-5/6 bg-blue-100" @viewDetail="closeDetail"/>
+     <ViewDetail v-if="viewDetail" :articleDetails="articleDetail" :useremail="email"  class="rounded-lg shadow-lg p-10 shadow-blue-600 flex md:ml-20 absolute w-5/6 h-5/6 bg-blue-100" @viewDetail="closeDetail"/>
    
         <div v-for="x in articleData" @click="openDetail" @mouseenter="changeData(x)" class="cursor-pointer flex flex-col flex-wrap gap-2 w-100 bg-blue-50 p-10 m-1 hover:p-11 hover:m-0 border rounded-lg shadow-md shadow-blue-400">
                
